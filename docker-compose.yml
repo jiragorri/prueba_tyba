@@ -1,0 +1,7 @@
+services:
+  pipeline:
+    build: .
+    image: tyba-movement-pipeline:local
+    volumes:
+      - ./data/raw:/app/data/raw:ro
+      - ./data/output:/app/data/output

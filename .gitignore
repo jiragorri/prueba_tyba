@@ -1,0 +1,8 @@
+.venv/
+.DS_Store
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.github/agents/
+data/output/*
+!data/output/.gitkeep
