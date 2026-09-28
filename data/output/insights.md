@@ -47,6 +47,16 @@ Los dos formatos de fecha observados se convierten a una fecha normalizada. Se c
 | movimientos_dia_T.parquet | movimientos_dia_T1.parquet | Eliminado (REMOVED) | 10,991 |
 | movimientos_dia_T.parquet | movimientos_dia_T1.parquet | Sin cambios (UNCHANGED) | 35,129 |
 
+## Análisis interpretativo
+
+El corte más reciente muestra un volumen de 49.000 movimientos y una base estable en torno a 3.000 clientes distintos, con un balance positivo de 1,113,305,841,982.35 en monto acumulado no nulo. La distribución por tipo indica una ligera ventaja de entradas sobre salidas: 27.100 movimientos de tipo IN frente a 21.900 de tipo OUT, lo que sugiere un flujo neto de efectivo positivo en el período observado.
+
+En términos de calidad, el conjunto es razonablemente consistente: no hay fechas nulas ni no parseables y la mayor parte de los valores usan formato ISO (45.567 filas, aproximadamente 93%). Sin embargo, hay 1.440 montos nulos, 4.485 descripciones vacías y 8.167 nombres comerciales nulos. Esos vacíos no invalidan el corte, pero sí reducen la capacidad analítica si se quiere segmentar por producto o canal comercial sin una limpieza previa.
+
+La comparación T → T1 sugiere una operación con movimiento moderado pero no trivial. Aproximadamente 35.129 claves permanecen sin cambios (71,7%), lo que indica que la mayor parte de la base es estable. Aun así, se observan 24.822 cambios no triviales entre ambos cortes: 3.840 corregidas, 9.991 nuevas y 10.991 eliminadas. Esto es consistente con un escenario donde la cartera o los movimientos reales cambian de forma continua, pero no de forma caótica ni totalmente desordenada. La presencia de 24 claves ambiguas confirma que no todas las coincidencias pueden emparejarse con seguridad sin un identificador de transacción estable; en esos casos el pipeline adopta una política conservadora y evita inventar correspondencias.
+
+En conjunto, el dato es útil para monitorizar evolución de movimientos, detectar cambios netos y priorizar limpieza de registros incompletos; sin embargo, para un análisis financiero más preciso y para automatizar decisiones operativas, seguiría siendo necesario contar con un identificador único de transacción en la fuente.
+
 ## Limitación de identidad
 
 Los archivos proporcionados contienen id_cliente, no el identificador de transacción descrito en el PDF. Por ello, movement_key es una clave compuesta candidata basada en cliente, fecha normalizada, producto, fondo y nombre comercial. Las claves duplicadas se clasifican como AMBIGUOUS en vez de adivinar una correspondencia. Sin un identificador de transacción estable no se pueden emparejar de forma fiable los cambios en los campos que forman la clave.
